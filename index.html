@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Balance Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+   
+</head>
+<body>
+
+<div>
+    <h1>Token Balance Tracker</h1>
+    <div id="balance">Fetching balance...</div>
+    <div id="change">Fetching change...</div>
+    <div id="alert">Alert: Balance reduced by 10% in the last 12 hours!</div>
+</div>
+
+<script>
+    const contractAddresses = [
+        "0xDCBc586cAb42a1D193CaCD165a81E5fbd9B428d7", // Mantle
+    ];
+
+    // Initialize Web3 with a provider (replace with your actual provider)
+    const web3 = new Web3.providers.HttpProvider("https://linea-mainnet.infura.io/v3/c19a465e92a142f38fba0cd21d3bf0eb")
+
+    console.log(">>>>>>",web3)
+
+    async function fetchTokenBalance(contractAddress) {
+        try {
+            const balance = await web3.eth.getBalance(contractAddress);
+            console.log("ASDHAGSHGVASJHD",balance)
+            return web3.utils.fromWei(balance, 'ether');
+        } catch (error) {
+            console.error('Error fetching balance:', error);
+            return null;
+        }
+    }
+
+    async function fetchPercentageChange(contractAddress) {
+        // Simulating percentage change for testing, replace with actual logic
+        return Math.random() * 20 - 10;
+    }
+
+    function updateBalance() {
+        const balanceElement = document.getElementById('balance');
+        const changeElement = document.getElementById('change');
+        const alertElement = document.getElementById('alert');
+
+        contractAddresses.forEach(async (address) => {
+            const balance = await fetchTokenBalance(address);
+            const change = await fetchPercentageChange(address);
+
+            balanceElement.innerHTML += `Token Balance (${address}): ${balance ? balance.toFixed(2) : 'Error'}<br>`;
+            changeElement.innerHTML += `Change in the last 12 hours (${address}): ${change.toFixed(2)}%<br>`;
+
+            // Check if the balance reduced by 10%
+            if (change < -10) {
+                alertElement.style.display = 'block';
+            } else {
+                alertElement.style.display = 'none';
+            }
+        });
+    }
+
+    // Fetch and update balance on page load
+    updateBalance();
+
+    // Fetch and update balance every 5 minutes (adjust as needed)
+    setInterval(updateBalance, 300000); // 5 minutes in milliseconds
+</script>
+
+</body>
+</html>
